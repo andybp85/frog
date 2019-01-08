@@ -1,3 +1,7 @@
+This fork strips out Bootstrap and jQuery and utilizes CSS grids and a few other things
+
+---
+
 # Frog
 
 <p><a href="http://www.flickr.com/photos/doug88888/4717363945/" title="Happy Green frog by @Doug88888, on Flickr"><img src="http://farm5.staticflickr.com/4070/4717363945_b73afd78a9.jpg" width="300" height="300" alt="Happy Green frog"></a></p>
