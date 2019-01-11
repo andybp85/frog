@@ -190,6 +190,7 @@
     (make-directories-if-needed to)
     (copy-directory/files from to))
   (prn0 "Creating files in ~a:" (build-path (top)))
+  (copy ".gitignore")
   (copy "frog.rkt")
   (copy "_src/About.md")
   (copy "_src/page-template.html")
