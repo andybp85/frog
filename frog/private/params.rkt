@@ -37,7 +37,7 @@
   (make-parameter
    (λ (path change-type)
      (cond
-       [(not (member (path-get-extension path) '(#".html" #".txt" #".xml")))
+       [(not (member (path-get-extension path) '(#".txt" #".xml")))
         (display #"\007") ; beep (hopefully)
         #t]
        [else #f]))))
