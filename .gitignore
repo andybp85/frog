@@ -24,4 +24,4 @@ example/img/posts/
 TAGS
 
 # Google refresh tokens
-frog/private/tokens/!.*
+gfrog/private/tokens/!.*

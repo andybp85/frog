@@ -1,5 +1,5 @@
 #lang info
-(define version "0.29")
+(define version "0.1")
 (define collection 'multi)
 (define deps '(["base" #:version "6.1"]
                "find-parent-dir"

@@ -1,4 +1,4 @@
-PACKAGE-NAME=frog
+PACKAGE-NAME=gfrog
 
 DEPS-FLAGS=--check-pkg-deps --unused-pkg-deps
 

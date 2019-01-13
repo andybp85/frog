@@ -80,31 +80,31 @@
                                                 (build-list depth (λ _ 'up)))))))
     (define edit-new-post? (make-parameter #f))
     (command-line
-     #:program "raco frog"
+     #:program "raco gfrog"
      #:once-each
-     [("--doc")
+     [("--og-doc")
       (""
-       "Browse full documentation for Frog.")
+       "Browse full documentation for the original Frog.")
       (help "T:frog")]
      [("--init")
       (""
-       "Initialize current directory as a new Frog project, creating"
+       "Initialize current directory as a new GFrog project, creating"
        "default files as a starting point.")
       (void)] ;; handled above
      [("--edit")
       (""
-       "Opens the file created by -n or -N in `current-editor` in frog.rkt"
+       "Opens the file created by -n or -N in `current-editor` in gfrog.rkt"
        "Supply this flag before one of those flags.")
       (edit-new-post? #t)]
      #:multi
      [("-n" "--new" "--new-markdown") title
-      (""
-       "Create a .md file for a new post based on today's date and <title>.")
-      (new-post title 'markdown (edit-new-post?))]
+                                      (""
+                                       "Create a .md file for a new post based on today's date and <title>.")
+                                      (new-post title 'markdown (edit-new-post?))]
      [("-N" "--new-scribble") title
-      (""
-       "Create a .scrbl file for a new post based on today's date and <title>.")
-      (new-post title 'scribble (edit-new-post?))]
+                              (""
+                               "Create a .scrbl file for a new post based on today's date and <title>.")
+                              (new-post title 'scribble (edit-new-post?))]
      [("-L" "--load-from-gdocs")
       (""
        "Load all posts from Google Docs.")
@@ -124,24 +124,23 @@
        "Watch for changed files, and regenerate the project."
        "(You'll need to refresh the browser yourself.)"
        "Customize which files should trigger the regeneration"
-       "by using current-rebuild?"
-       "Use `raco frog -bwp` for development.")
+       "by using current-rebuild?")
       (set! watch? #t)]
      [("--port") number
-      (""
-       "The port number for -s/--serve or -p/--preview."
-       "Supply this flag before one of those flags."
-       "Default: 3000.")
-      (set! port (string->number number))]
+                 (""
+                  "The port number for -s/--serve or -p/--preview."
+                  "Supply this flag before one of those flags."
+                  "Default: 3000.")
+                 (set! port (string->number number))]
      [("--root") path
-      (""
-       "The root directory for -s/--serve or -p/--preview."
-       "Supply this flag before one of those flags."
-       "If frog.rkt says (current-uri-prefix \"/path/to/site/blog\"),
+                 (""
+                  "The root directory for -s/--serve or -p/--preview."
+                  "Supply this flag before one of those flags."
+                  "If frog.rkt says (current-uri-prefix \"/path/to/site/blog\"),
        try using `--root /path/to/site`."
-       "Default: One less than the number of dirs in current-uri-prefix,
+                  "Default: One less than the number of dirs in current-uri-prefix,
         above current-output-dir.")
-      (set! root path)]
+                 (set! root path)]
      #:once-any
      [("-s" "--serve")
       (""
@@ -163,18 +162,19 @@
              #:root root)]
      #:once-any
      [("-S" "--silent") "Silent. Put first."
-      (current-verbosity -1)]
+                        (current-verbosity -1)]
      [("-v" "--verbose") "Verbose. Put first."
-      (current-verbosity 1)
-      (prn1 "Verbose mode")]
+                         (current-verbosity 1)
+                         (prn1 "Verbose mode")]
      [("-V" "--very-verbose") "Very verbose. Put first."
-      (current-verbosity 2)
-      (prn2 "Very verbose mode")])))
+                              (current-verbosity 2)
+                              (prn2 "Very verbose mode")])))
 
 (define (find-frog-root)
   (define (try file)
     (find-parent-containing (current-directory) file))
-  (or (let ([x (or (try "frog.rkt")
+  (or (let ([x (or (try "gfrog.rkt")
+                   (try "frog.rkt")
                    (try ".frogrc"))])
         (and x (simplify-path x)))
       (current-directory)))
@@ -196,7 +196,7 @@
     (make-directories-if-needed to)
     (copy-directory/files from to))
   (prn0 "Creating files in ~a:" (build-path (top)))
-  (copy "frog.rkt")
+  (copy "gfrog.rkt")
   (copy "_src/About.md")
   (copy "_src/page-template.html")
   (copy "_src/post-template.html")
@@ -204,7 +204,7 @@
   (copy "css/")
   (copy "js/")
   (copy "img/")
-  (prn0 "Project ready. Try `raco frog -bp` to build and preview."))
+  (prn0 "Project ready. Try `raco gfrog -bwp` to build and preview."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -240,7 +240,7 @@
             [else (define new-post (read-post path))
                   (when new-post
                     (hash-set! new-posts path new-post))]))
-      new-posts)
+    new-posts)
   (define new-posts
     (fold-files* on-file (make-hash) (src/posts-path) #f))
   ;; Make hashes of tags -> posts, old and new.
@@ -284,16 +284,16 @@
   (for ([(path post) (in-hash new-posts)])
     (define file-modified file-or-directory-modify-seconds) ;brevity
     (when (or ;; Target doesn't exist
-              (not (file-exists? (post-dest-path post)))
-              ;; Target is older than its dependents
-              (let ([secs (file-modified (post-dest-path post))])
-                (or (< secs (post-modified post))
-                    (< secs (file-modified (post-template.html)))
-                    (< secs (file-modified (page-template.html)))))
-              ;; Post isn't in old-posts or differs from version in
-              ;; old-posts (includes case of older/newer links
-              ;; changing).
-              (not (equal? post (hash-ref old-posts path #f))))
+           (not (file-exists? (post-dest-path post)))
+           ;; Target is older than its dependents
+           (let ([secs (file-modified (post-dest-path post))])
+             (or (< secs (post-modified post))
+                 (< secs (file-modified (post-template.html)))
+                 (< secs (file-modified (page-template.html)))))
+           ;; Post isn't in old-posts or differs from version in
+           ;; old-posts (includes case of older/newer links
+           ;; changing).
+           (not (equal? post (hash-ref old-posts path #f))))
       (write-post-page post
                        (hash-ref new-posts (post-older post) #f)
                        (hash-ref new-posts (post-newer post) #f))))
