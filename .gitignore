@@ -23,3 +23,5 @@ example/img/posts/
 # Emacs tags
 TAGS
 
+# Google refresh tokens
+frog/private/tokens/!.*

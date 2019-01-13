@@ -18,6 +18,7 @@
          (only-in find-parent-dir find-parent-containing)
          "bodies-page.rkt"
          (prefix-in user-frog.rkt: "../config/private/load.rkt")
+         "gloader.rkt"
          "new-post.rkt"
          "non-posts.rkt"
          "upgrade/old-config.rkt"
@@ -104,6 +105,10 @@
       (""
        "Create a .scrbl file for a new post based on today's date and <title>.")
       (new-post title 'scribble (edit-new-post?))]
+     [("-L" "--load-from-gdocs")
+      (""
+       "Load all posts from Google Docs.")
+      (load-posts)]
      [("-b" "--build")
       (""
        "Generate files.")
@@ -119,7 +124,8 @@
        "Watch for changed files, and regenerate the project."
        "(You'll need to refresh the browser yourself.)"
        "Customize which files should trigger the regeneration"
-       "by using current-rebuild?")
+       "by using current-rebuild?"
+       "Use `raco frog -bwp` for development.")
       (set! watch? #t)]
      [("--port") number
       (""
@@ -190,7 +196,6 @@
     (make-directories-if-needed to)
     (copy-directory/files from to))
   (prn0 "Creating files in ~a:" (build-path (top)))
-  (copy ".gitignore")
   (copy "frog.rkt")
   (copy "_src/About.md")
   (copy "_src/page-template.html")

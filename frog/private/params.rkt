@@ -41,3 +41,7 @@
         (display #"\007") ; beep (hopefully)
         #t]
        [else #f]))))
+
+(define ga-client-id (make-parameter (getenv "FROG_GA_CLIENT_ID")))
+(define ga-client-secret (make-parameter (getenv "FROG_GA_CLIENT_SECRET")))
+(define ga-posts-folder (make-parameter (getenv "FROG_GA_CLIENT_ID")))
