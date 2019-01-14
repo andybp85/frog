@@ -65,7 +65,8 @@
            'rel-next          rel-next
            'all-tag-pairs     all-tag-pairs
            'tags-list-items   (xexprs->string (tags-list-items))
-           'tags/feeds        (xexprs->string (tags/feeds)))))
+           'tags/feeds        (xexprs->string (tags/feeds))
+           'current-year      (date-year (current-date)))))
 
 (define (xexprs->string xs)
   (string-join (map xexpr->string xs) "\n"))
