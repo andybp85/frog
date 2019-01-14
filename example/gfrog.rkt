@@ -1,4 +1,4 @@
-#lang frog/config
+#lang gfrog/config
 
 ;; Called early when Frog launches. Use this to set parameters defined
 ;; in frog/params.

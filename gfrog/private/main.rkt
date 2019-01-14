@@ -136,7 +136,7 @@
                  (""
                   "The root directory for -s/--serve or -p/--preview."
                   "Supply this flag before one of those flags."
-                  "If frog.rkt says (current-uri-prefix \"/path/to/site/blog\"),
+                  "If gfrog.rkt says (current-uri-prefix \"/path/to/site/blog\"),
        try using `--root /path/to/site`."
                   "Default: One less than the number of dirs in current-uri-prefix,
         above current-output-dir.")
