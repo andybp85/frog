@@ -3,6 +3,7 @@
 (require rackjure/threading
          (planet ryanc/webapi:1:=1/oauth2)
          file/md5
+         pkg/lib
          "params.rkt"
          "../paths.rkt")
 
@@ -12,7 +13,7 @@
 
 (define token '())
 (define token-file
-  (build-path (current-directory) "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
+  (build-path (pkg-directory "gfrog") "private" "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
 
 (define drive-client
   (oauth2-client
@@ -35,7 +36,7 @@
 
 (define (set-save-tokens access-token refresh-token)
   (set! token (string-append "Authorization: Bearer " access-token))
-  (with-output-to-file token-file #:exists 'replace
+  (with-output-to-file token-file #:exists 'truncate
     (λ ()
       (printf refresh-token))))
 

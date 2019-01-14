@@ -24,4 +24,5 @@ example/img/posts/
 TAGS
 
 # Google refresh tokens
-gfrog/private/tokens/!.*
+gfrog/private/tokens/*
+!gfrog/private/tokens/.gitkeep
