@@ -11,7 +11,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; these funcs copied from https://github.com/fgmart/google-drive-racket
 (define (get-files obj)
-  (hash-ref obj 'files))
+  (hash-ref obj 'files
+            (λ ()
+              (eprintf "No files found in Google Drive folder.\n")
+              (exit 1))))
 
 (define (list-children folder-id . next-page-token)
   (read-json
@@ -67,13 +70,13 @@
 
 (define (load-posts)
   (google-login)
-  (map
-   (λ (file)
-     (hash
-      'content (parse-post file)
-      'title (hash-ref file 'name)
-      'meta (make-post-meta (get-post-meta "description" (hash-ref file 'id)))))
-   (list-all-children (ga-posts-folder))))
+  (write (map
+          (λ (file)
+            (hash
+             'content (parse-post file)
+             'title (hash-ref file 'name)
+             'meta (make-post-meta (get-post-meta "description" (hash-ref file 'id)))))
+          (list-all-children (ga-posts-folder)))))
 
 ;(define posts
 ;  (list

@@ -407,7 +407,7 @@
                #:root root)
   (define watcher-thread
     (cond [watch? (unless (and watch-path watch-callback)
-                    (error 'frog "No watch callback given"))
+                    (error 'gfrog "No watch callback given"))
                   (watch-directory (build-path watch-path)
                                    '(file)
                                    watch-callback

@@ -8,7 +8,7 @@ You need to define three params:
 ```
 ga-client-id
 ga-client-secret
-(define ga-posts-folder
+ga-posts-folder
 ```
 How you do so is up to you, but most importantly:
 

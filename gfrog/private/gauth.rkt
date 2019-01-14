@@ -35,7 +35,7 @@
   (values (send roauth get-access-token) (send roauth get-refresh-token)))
 
 (define (set-save-tokens access-token refresh-token)
-  (set! token (string-append "Authorization: Bearer " access-token))
+  (set! token (list (string-append "Authorization: Bearer " access-token)))
   (with-output-to-file token-file #:exists 'truncate
     (λ ()
       (printf refresh-token))))
