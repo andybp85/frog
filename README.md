@@ -20,9 +20,9 @@ Note that tokens are stored in files named with a hash of param `current-scheme/
 
 ### Default env vars
 ```
-FROG_GA_CLIENT_ID
-FROG_GA_CLIENT_SECRET
-FROG_GA_POSTS_FOLDER
+GFROG_GA_CLIENT_ID
+GFROG_GA_CLIENT_SECRET
+GFROG_GA_POSTS_FOLDER
 ```
 
 ### Set up credentials
