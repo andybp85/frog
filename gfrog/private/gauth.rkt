@@ -1,6 +1,6 @@
-#lang racket
+#lang racket/base
 
-(require rackjure/threading
+(require racket/class
          (planet ryanc/webapi:1:=1/oauth2)
          file/md5
          pkg/lib
@@ -13,7 +13,7 @@
 
 (define token '())
 (define token-file
-  (build-path (pkg-directory "gfrog") "private" "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
+  (build-path (pkg-directory "gfrog") "gfrog" "private" "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
 
 (define drive-client
   (oauth2-client
@@ -21,18 +21,18 @@
    #:secret (ga-client-secret)))
 
 (define (get-new-tokens)
-  (define boauth (oauth2/request-auth-code/browser
-                  google-auth-server
-                  drive-client
-                  '("https://www.googleapis.com/auth/drive")))
-  (values (send boauth get-access-token) (send boauth get-refresh-token)))
+  (let ([boauth (oauth2/request-auth-code/browser
+                 google-auth-server
+                 drive-client
+                 '("https://www.googleapis.com/auth/drive"))])
+    (values (send boauth get-access-token) (send boauth get-refresh-token))))
 
 (define (use-refresh-token refresh-token)
-  (define roauth (oauth2/refresh-token
-                  google-auth-server
-                  drive-client
-                  refresh-token))
-  (values (send roauth get-access-token) (send roauth get-refresh-token)))
+  (let ([roauth (oauth2/refresh-token
+                 google-auth-server
+                 drive-client
+                 refresh-token)])
+    (values (send roauth get-access-token) (send roauth get-refresh-token))))
 
 (define (set-save-tokens access-token refresh-token)
   (set! token (list (string-append "Authorization: Bearer " access-token)))

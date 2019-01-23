@@ -1,10 +1,13 @@
-#lang racket
+#lang racket/base
 
-(require net/url
-         yaml
+(require racket/class
+         html-parsing
          json
-         "./params.rkt"
-         "./gauth.rkt")
+         net/url
+         yaml
+         "gauth.rkt"
+         "gparser.rkt"
+         "params.rkt")
 
 (provide load-posts)
 
@@ -38,7 +41,7 @@
         (get-files this-page))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (get-file mime file-id)
+(define (get-gdoc-file mime file-id)
   (get-pure-port
    (string->url (string-append "https://www.googleapis.com/drive/v3/files/"
                                file-id
@@ -49,12 +52,7 @@
 ;(define (stripbom p)
 ;  (regexp-replace* (~a "^\uFEFF") p ""))
 
-(define (parse-post post)
-  (port->string
-   (get-file "text/html"
-             (hash-ref post 'id))))
-
-(define (get-post-meta fields file-id)
+(define (get-gdoc-file-meta fields file-id)
   (read-json
    (get-pure-port
     (string->url (string-append "https://www.googleapis.com/drive/v3/files/"
@@ -63,27 +61,16 @@
                                 fields))
     token)))
 
-(define (make-post-meta description)
-  (if (hash-has-key? description 'description)
-      (string->yaml (hash-ref description 'description))
-      '()))
+(define (get-posts)
+  (map
+   (λ (file)
+     (hash
+      'content (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref file 'id)))
+      'title (hash-ref file 'name)
+      'meta (parse-gdoc/meta (get-gdoc-file-meta "description" (hash-ref file 'id)))))
+   (list-all-children (ga-posts-folder))))
 
 (define (load-posts)
   (google-login)
-  (write (map
-          (λ (file)
-            (hash
-             'content (parse-post file)
-             'title (hash-ref file 'name)
-             'meta (make-post-meta (get-post-meta "description" (hash-ref file 'id)))))
-          (list-all-children (ga-posts-folder)))))
+  (write (get-posts)))
 
-;(define posts
-;  (list
-; '#hash((content . ((h3 ((id "hello-new-world")) "Hello New World!") (p () "Second Post"))) (meta . ()) (title . "hello_world2"))
-; (hash 'content '((h3 ((id "hello-world")) "Hello World!") (p () "First Post")) 'meta (hash "categories" "world, hello" "date" (date* 0 0 0 3 1 2019 4 2 #f 0 0 "UTC")) 'title "hello_world")))
-
-;(define posts
-;  (list
-; '#hash((content . ((h3 ((id "hello-new-world")) "Hello New World!") (p () "Second Post"))) (meta . ()) (title . "hello_world2"))
-; '#hash((content . ((h3 ((id "hello-new-world")) "Hello New World!") (p () "Second Post"))) (meta . ()) (title . "hello_world2"))))
