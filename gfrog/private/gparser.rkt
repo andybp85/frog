@@ -9,24 +9,11 @@
 (provide parse-gdoc/post
          parse-gdoc/meta)
 
-(define (parse-gdoc/meta description)
-  (if (hash-has-key? description 'description)
-      (string->yaml (hash-ref description 'description))
+
+(define (parse-gdoc/meta meta)
+  (if (hash-has-key? meta 'description)
+      (string->yaml (hash-ref meta 'description))
       '()))
-
-
-(define (parse-nodes nodes)
-
-  (define (empty-a? node)
-    (and ((ntype-names?? '(a)) node) (sxml:empty-element? node)))
-
-  (define (fold-node node result)
-    (cond
-      [(or (empty-a? node) (equal? '(& nbsp) node)) result]
-      [((ntype-names?? '(span)) node) `(,@result ,@(parse-span node))]
-      [else `(,@result ,(parse-node node))]))
-
-  (foldl fold-node '() nodes))
 
 
 (define (parse-span span)
@@ -43,15 +30,15 @@
   (define (underline? style)
     (string=? style "text-decoration:underline"))
 
-  (define (not-link span)
+  (define (not-link? span)
     (not ((select-first-kid  (ntype-names?? '(a))) (sxml:content span))))
 
   (define (get-decorations styles-list)
     (let ([decos (filter (λ (style)
                            (or
-                            (and (color? style) (not-link span))
+                            (and (color? style) (not-link? span))
                             (background-color? style)
-                            (and (underline? style) (not-link span))))
+                            (and (underline? style) (not-link? span))))
                          styles-list)])
       (if (empty? decos)
           #f
@@ -92,17 +79,10 @@
       [(apply check `(,styles-list)) => (make-next res)]
       [else res]))
     
-  (define result
-    (foldl
-     (apply-check (styles-list span))
-     parsed-contents
-     `(,check-bold ,check-italics ,check-color-and-highlight)))
-
-  ; if result is an element we need to wrap it in a list so when we expand 
-  ; the result in parse-nodes it will expand the element out of the list
-  (if (sxml:element? result)
-      `(,result)
-      result))
+  (foldl
+   (apply-check (styles-list span))
+   parsed-contents
+   `(,check-bold ,check-italics ,check-color-and-highlight)))
 
   
 (define (parse-node node)
@@ -150,6 +130,23 @@
     [(empty-html-element? node) (parse-elm-attrs node)]
     [(sxml:element? node) (sxml:change-content (parse-elm-attrs node) (parse-nodes (sxml:content node)))]
     [else node]))
+
+
+(define (parse-nodes nodes)
+
+  (define (empty-a? node)
+    (and ((ntype-names?? '(a)) node) (sxml:empty-element? node)))
+
+  (define (fold-node node result)
+    (cond
+      [(or (empty-a? node) (equal? '(& nbsp) node)) result]
+      [((ntype-names?? '(span)) node) (let ([parsed (parse-span node)])
+                                        (if (sxml:element? parsed)
+                                            `(,@result ,parsed)
+                                            `(,@result ,@parsed)))]
+      [else `(,@result ,(parse-node node))]))
+
+  (foldl fold-node '() nodes))
 
 
 (define (parse-gdoc/post content)  

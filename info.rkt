@@ -4,6 +4,7 @@
 (define collection 'multi)
 (define deps '(["base" #:version "6.1"]
                "find-parent-dir"
+               "gregor"
                "html-lib"
                "html-parsing"
                ["markdown" #:version "0.25"]

@@ -13,7 +13,7 @@
 
 (define token '())
 (define token-file
-  (build-path (pkg-directory "gfrog") "gfrog" "private" "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
+  (build-path (pkg-directory "gfrog") "private" "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
 
 (define drive-client
   (oauth2-client
