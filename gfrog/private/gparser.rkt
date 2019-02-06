@@ -149,7 +149,8 @@
   (foldl fold-node '() nodes))
 
 
-(define (parse-gdoc/post content)  
-  (parse-nodes
-   (sxml:content
-    (first ((sxpath '("html" "body")) (html->xexp content))))))
+(define (parse-gdoc/post content)
+  (srl:sxml->html-noindent
+   (parse-nodes
+    (sxml:content
+     (first ((sxpath '("html" "body")) (html->xexp content)))))))

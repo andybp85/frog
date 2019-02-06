@@ -9,7 +9,7 @@
          "gauth.rkt"
          "gparser.rkt"
          "params.rkt"
-         "post-struct.rkt")
+         "paths.rkt")
 
 (provide load-posts)
 
@@ -63,76 +63,57 @@
                                 fields))
     token)))
 
-;(struct post (content title description modifiedTime))
-
-(define (get-posts)
+(define (get-posts-meta)
   (map
    (λ (file)
+         
+     (define meta
+       (get-gdoc-file-meta "description,modifiedTime,name" (hash-ref file 'id)))
+         
+     (define parsed-meta
+       (parse-gdoc/meta meta))
+         
+     (define (file-name)
+       (date-display-format 'iso-8601)
+       (string-append*
+        (date->string (hash-ref parsed-meta "date"))
+        "-"
+        (string-replace
+         (string-replace
+          (string-downcase (hash-ref meta 'name))
+          " " "_")
+         #px"[^[:word:]]" "")
+        '(".html")))
+         
      (hash
-      'content (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref file 'id)))
-      'title (hash-ref file 'name)
-      'meta (parse-gdoc/meta (get-gdoc-file-meta "description,modifiedTime" (hash-ref file 'id)))))
+      'id (hash-ref file 'id)
+      'meta parsed-meta
+      'modified (iso8601->datetime (hash-ref meta 'modifiedTime))
+      'filename (file-name)))
    (list-all-children (ga-posts-folder))))
 
-(define (get-posts-list)
-  '())
 
-(define (get-post-body id)
-  (parse-gdoc/post (get-gdoc-file "text/html" id)))
+(define (download-post id)
 
-(define (get-posts-meta)
-  (map (λ (file)
-         
-         (define meta
-           (get-gdoc-file-meta "description,modifiedTime,name" (hash-ref file 'id)))
-         
-         (define post-meta
-           (parse-gdoc/meta meta))
-         
-         (define modified
-           (iso8601->datetime (hash-ref meta 'modifiedTime)))
-         
-         (define (file-name)
-           (date-display-format 'iso-8601)
-           (string-append*
-            (date->string (hash-ref post-meta "date"))
-            "-"
-            (string-replace
-             (string-replace
-              (string-downcase (hash-ref meta 'name))
-              " " "_")
-             #px"[^[:word:]]" "")
-            '(".html")))
-         
-         (hash
-          'id (hash-ref file 'id)
-          'meta post-meta
-          'modified modified
-          'filename (file-name)))
-       (list-all-children (ga-posts-folder))))
+  (define (get-post-body id)
+    (parse-gdoc/post (get-gdoc-file "text/html" id)))
+  
+  (get-post-body id))
+
 
 (define (load-posts)
 
+  (define (gdoc-newer? post-path post-meta)
+    (datetime<?
+     (posix->datetime (file-or-directory-modify-seconds post-path))
+     (hash-ref post-meta 'modified)))
+
   (google-login)
 
-  ;  (src/posts-path)
-  
-  (write (get-posts-meta)))
-
-;  (define last-build-time
-;    (seconds->date
-;     (file-or-directory-modify-seconds
-;      (string->path "index.html"))))
-
-;  (define posts (list-all-children (ga-posts-folder)))
-;
-;  
-;  
-;  (google-login)
-;  (write (get-posts)))
-
-;(load-posts)
-
-
-
-       
+  (for ([post-meta (get-posts-meta)])
+    (define post-path
+      (build-path (src/posts-path) (hash-ref post-meta 'filename)))
+    (if (or (not (file-exists? post-path)) (gdoc-newer? post-path post-meta))
+        (with-output-to-file post-path  #:exists 'truncate
+          (λ () (printf (download-post (hash-ref post-meta 'id)))))
+        '())))
