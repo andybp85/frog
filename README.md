@@ -1,4 +1,10 @@
-# This is a work in progress and the below reflects plans, not current status
+### Status:
+1. get working - WIP
+2. add contracts
+3. add unit tests
+
+## Not yet working and the below reflects plans
+
 # GFrog
 
 This fork utilizes [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) and [Tachyons](https://tachyons.io/) for the template (instead of Bootstrap/jQuery), as well as implements a command to load new posts from a Google Docs folder (which is based heavily on [google-drive-racket](https://github.com/fgmart/google-drive-racket)).
