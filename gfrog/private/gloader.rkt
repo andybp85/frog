@@ -92,15 +92,6 @@
       'filename (file-name)))
    (list-all-children (ga-posts-folder))))
 
-
-(define (download-post id)
-
-  (define (get-post-body id)
-    (parse-gdoc/post (get-gdoc-file "text/html" id)))
-  
-  (get-post-body id))
-
-
 (define (load-posts)
 
   (define (gdoc-newer? post-path post-meta)
@@ -111,9 +102,10 @@
   (google-login)
 
   (for ([post-meta (get-posts-meta)])
+
     (define post-path
       (build-path (src/posts-path) (hash-ref post-meta 'filename)))
+    
     (if (or (not (file-exists? post-path)) (gdoc-newer? post-path post-meta))
-        (with-output-to-file post-path  #:exists 'truncate
-          (λ () (printf (download-post (hash-ref post-meta 'id)))))
+        (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-path)
         '())))
