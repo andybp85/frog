@@ -204,7 +204,8 @@
   (copy "css/")
   (copy "js/")
   (copy "img/")
-  (prn0 "Project ready. Try `raco gfrog -bwp` to build and preview."))
+  (copy ".gitignore")
+  (prn0 "Project ready. Try `raco gfrog -L -bwp` to build and preview."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
