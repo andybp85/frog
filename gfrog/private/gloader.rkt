@@ -107,6 +107,5 @@
     (define post-path
       (build-path (src/posts-path) (hash-ref post-meta 'filename)))
     
-    (if (or (not (file-exists? post-path)) (gdoc-newer? post-path post-meta))
-        (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-meta post-path)
-        '())))
+    (when (or (not (file-exists? post-path)) (gdoc-newer? post-path post-meta))
+        (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-meta post-path))))

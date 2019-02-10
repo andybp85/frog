@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require markdown
+         (only-in xml comment)
          racket/contract/base
          racket/contract/region
          racket/file
@@ -84,6 +85,11 @@
       (return #f))
     ;; Split out the blurb (may be less than the entire body)
     (define-values (blurb more?) (above-the-fold body))
+    ;; Strip gdoc comment
+    (define (strip-gdoc-more body)
+      (filter (λ (xexprs)
+                (match xexprs [(comment " more ") #f] [_ #t]))
+              body))
     ;; Make the destination HTML pathname
     (define date-struct (date-string->struct/user-error path date-str))
     (define dest-path
@@ -103,7 +109,7 @@
           tags
           (~> blurb enhance-body xexprs->string)
           more?
-          (~> body enhance-body xexprs->string))))
+          (~> (strip-gdoc-more body) enhance-body xexprs->string))))
 
 (define (date-string->struct/user-error path s)
   (with-handlers
@@ -231,6 +237,7 @@
   (match x
     [`(p ,(pregexp "\\s*<!--\\s*more\\s*-->\\s*")) #t] ;old markdown parser
     [`(!HTML-COMMENT () ,(pregexp "more")) #t]         ;new markdown parser
+    [(comment " more ") #t]                           ;gdocs parser
     [_ #f]))
 
 (module+ test

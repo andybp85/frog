@@ -1,14 +1,17 @@
 #lang racket/base
 
 (require racket/match
+         racket/port
          rackjure/threading
          xml
-         (only-in html read-html-as-xml))
+         (only-in html read-html-as-xml
+                       read-html-comments))
 
 (provide read-html-as-xexprs)
 
 (define (read-html-as-xexprs) ;; (-> (listof xexpr?))
-  (~>> (read-html-as-xml)
+    (read-html-comments #t)
+    (~>> (read-html-as-xml)
        (element #f #f 'root '())
        xml->xexpr
        decode-ampersands-in-attributes
