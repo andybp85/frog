@@ -10,6 +10,7 @@
          racket/path ;moved to racket/base only as of Racket 6
          racket/runtime-path
          racket/set
+         racket/system
          racket/vector
          rackjure/threading
          web-server/dispatchers/dispatch
@@ -205,6 +206,7 @@
   (copy "js/")
   (copy "img/")
   (copy ".gitignore")
+  (system "npm install postcss-cli uncss autoprefixer cssnano")
   (prn0 "Project ready. Try `raco gfrog -L -bwp` to build and preview."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
