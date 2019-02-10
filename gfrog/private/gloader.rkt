@@ -87,9 +87,10 @@
          
      (hash
       'id (hash-ref file 'id)
-      'meta parsed-meta
+      'info parsed-meta
       'modified (iso8601->datetime (hash-ref meta 'modifiedTime))
-      'filename (file-name)))
+      'filename (file-name)
+      'title (hash-ref meta 'name)))
    (list-all-children (ga-posts-folder))))
 
 (define (load-posts)
@@ -107,5 +108,5 @@
       (build-path (src/posts-path) (hash-ref post-meta 'filename)))
     
     (if (or (not (file-exists? post-path)) (gdoc-newer? post-path post-meta))
-        (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-path)
+        (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-meta post-path)
         '())))
