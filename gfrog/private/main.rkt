@@ -196,8 +196,6 @@
               (list _ v))
      v]))
 
-
-
 (define (copy path)
   (define from (~> (build-path example path) simplify-path))
   (define to   (~> (build-path (top) path) simplify-path))
@@ -207,13 +205,11 @@
 
 (define (setup-node)
   (when (node-available)
-
     (define (check-node-version vstring)
       (let ([vlist (map (λ (v) (string->number v)) (string-split (string-trim vstring "v") "."))])
         (and
          (>= (first vlist) 11)
          (>= (second vlist) 9))))
-
     (cond
       [(and
         (check-node-version (port->string (first (process "node --version"))))
@@ -381,15 +377,11 @@
   (prn1 "Generating sitemap.txt")
   (with-output-to-file (build-path (www-path) "sitemap.txt") #:exists 'replace
     (thunk
-     (for-each displayln
-               (map full-uri
-                    (append (map post-uri-path (filter linked-post?
-                                                       (hash-values new-posts)))
-                            non-post-pages)))))
-
-  ;; [6] postcss cleanup and inlining
-  (prn1 "Cleaning and inlining CSS")
-  )
+     (for-each displayln (map full-uri
+                              (append
+                               (map post-uri-path
+                                    (filter linked-post? (hash-values new-posts)))
+                               non-post-pages))))))
 
 ;;----------------------------------------------------------------------------
 

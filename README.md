@@ -2,10 +2,11 @@
 ### Status:
 1. posts loading from google docs - DONE
 2. posts from gdocs building correctly - DONE
-3. css cleanup - WIP
-4. finish template
-5. add contracts
-6. add unit tests
+3. css cleanup - DONE
+4. update verbose logging - WIP
+5. finish template
+6. add contracts
+7. add unit tests
 
 # GFrog
 
@@ -87,6 +88,8 @@ The full processing results in a minified HTML file with just the CSS styles pre
 3. Which is then run through autoprefixer and cssnano via postcss for vendor prefix double-checking and minification.
 4. The normal `<link>` CSS tags are stripped from the HTML string and the `<!-- CSS -->` comment is replaced with the CSS string.
 5. The whole HTML string is minified and written over the file it was read from.
+
+Note this runs after the file is generated, so if the script errors, the un-minified file will be left in place.
 
 ---
 **Below is the original readme for Frog, provided for reference. The build status, etc. do not accurately reflect this repo**

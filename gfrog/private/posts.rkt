@@ -10,6 +10,7 @@
          racket/match
          racket/port
          racket/string
+         racket/system
          rackjure/threading
          (only-in srfi/1 break)
          "../config/private/load.rkt"
@@ -113,12 +114,12 @@
 
 (define (date-string->struct/user-error path s)
   (with-handlers
-    ([exn:fail?
-      (λ (e)
-        (raise-user-error
-         (~a (path->string path)
-             ": Date metadata must be ISO-8601 format -- yyyy-mm-ddThr:mn:sc -- but is")
-         s))])
+      ([exn:fail?
+        (λ (e)
+          (raise-user-error
+           (~a (path->string path)
+               ": Date metadata must be ISO-8601 format -- yyyy-mm-ddThr:mn:sc -- but is")
+           s))])
     (date->date-struct s)))
 
 ;; (listof xexpr?) path? -> (list string? string? (listof string?) (listof xexpr?))
@@ -165,58 +166,58 @@
 (module+ test
   (define p (string->path "/path/to/file"))
   (test-case "Various HTML \"envelopes\" and HTML entities"
-    (check-equal? (meta-data `((pre () (code () "Title: title\nDate: date\nTags: DRAFT\n"))) p)
-                  (list "title" "date" '("DRAFT") '()))
-    (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags: DRAFT\n")) p)
-                  (list "title" "date" '("DRAFT") '()))
-    (check-equal? (meta-data `((pre "Title: title\nDate: date\nTags: DRAFT\n")) p)
-                  (list "title" "date" '("DRAFT") '()))
-    (check-equal? (meta-data `((p () "Title: title" ndash "hyphen \nDate: date\nTags: DRAFT\n")) p)
-                  (list "title-hyphen" "date" '("DRAFT") '())))
+             (check-equal? (meta-data `((pre () (code () "Title: title\nDate: date\nTags: DRAFT\n"))) p)
+                           (list "title" "date" '("DRAFT") '()))
+             (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags: DRAFT\n")) p)
+                           (list "title" "date" '("DRAFT") '()))
+             (check-equal? (meta-data `((pre "Title: title\nDate: date\nTags: DRAFT\n")) p)
+                           (list "title" "date" '("DRAFT") '()))
+             (check-equal? (meta-data `((p () "Title: title" ndash "hyphen \nDate: date\nTags: DRAFT\n")) p)
+                           (list "title-hyphen" "date" '("DRAFT") '())))
   (test-case "Authors meta data is converted to prefixed tags"
-    (check-equal? (meta-data `((p () "Title: title\nDate: date\nTags: DRAFT\nAuthors:Alice Baker,Charlie Dan\n")) p)
-                  (list "title"
-                        "date"
-                        (list "DRAFT"
-                              (make-author-tag "Alice Baker")
-                              (make-author-tag "Charlie Dan"))
-                        '())))
+             (check-equal? (meta-data `((p () "Title: title\nDate: date\nTags: DRAFT\nAuthors:Alice Baker,Charlie Dan\n")) p)
+                           (list "title"
+                                 "date"
+                                 (list "DRAFT"
+                                       (make-author-tag "Alice Baker")
+                                       (make-author-tag "Charlie Dan"))
+                                 '())))
   (test-case "Handle spaces (or not) around key: and value"
-    (check-equal? (meta-data `((pre "Title:title\nDate:date\nTags:DRAFT\n")) p)
-                  (list "title" "date" '("DRAFT") '()))
-    (check-equal? (meta-data `((pre " Title:  title  \n  Date: date \nTags: DRAFT  \n")) p)
-                  (list "title" "date" '("DRAFT") '())))
+             (check-equal? (meta-data `((pre "Title:title\nDate:date\nTags:DRAFT\n")) p)
+                           (list "title" "date" '("DRAFT") '()))
+             (check-equal? (meta-data `((pre " Title:  title  \n  Date: date \nTags: DRAFT  \n")) p)
+                           (list "title" "date" '("DRAFT") '())))
   (test-case "Error raised for missing metadata"
-    (check-exn #px"missing \"Title\""
-               (thunk (meta-data '((pre "")) p)))
-    (check-exn #px"missing \"Title\""
-               (thunk (meta-data '((p () "")) p))))
+             (check-exn #px"missing \"Title\""
+                        (thunk (meta-data '((pre "")) p)))
+             (check-exn #px"missing \"Title\""
+                        (thunk (meta-data '((p () "")) p))))
   (test-case "Error raised for blank Title or Date -- https://github.com/greghendershott/frog/issues/213"
-    (check-exn #px"missing non-blank \"Title\""
-               (thunk (meta-data '((pre "Title: \n")) p)))
-    (check-exn #px"missing non-blank \"Date\""
-               (thunk (meta-data '((pre "Title: Some Title\nDate: \n")) p))))
+             (check-exn #px"missing non-blank \"Title\""
+                        (thunk (meta-data '((pre "Title: \n")) p)))
+             (check-exn #px"missing non-blank \"Date\""
+                        (thunk (meta-data '((pre "Title: Some Title\nDate: \n")) p))))
   (test-case "https://github.com/greghendershott/frog/issues/142"
-    (check-equal? (meta-data '((p
-                                ()
-                                "Title: A Beginner"
-                                rsquo
-                                "s Scribble Post\nDate: 2013-06-19T00:00:00\nTags: Racket, blogging"))
-                             (string->path "/"))
-                  (list "A Beginner's Scribble Post"
-                        "2013-06-19T00:00:00"
-                        '("Racket" "blogging")
-                        '())))
+             (check-equal? (meta-data '((p
+                                         ()
+                                         "Title: A Beginner"
+                                         rsquo
+                                         "s Scribble Post\nDate: 2013-06-19T00:00:00\nTags: Racket, blogging"))
+                                      (string->path "/"))
+                           (list "A Beginner's Scribble Post"
+                                 "2013-06-19T00:00:00"
+                                 '("Racket" "blogging")
+                                 '())))
   (test-case "https://github.com/greghendershott/frog/issues/189"
-    (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags: \n")) p)
-                  (list "title" "date" '() '()))
-    (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags:\n")) p)
-                  (list "title" "date" '() '()))
-    (check-equal? (meta-data `((pre () "Title: title\nDate: date\n")) p)
-                  (list "title" "date" '() '())))
+             (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags: \n")) p)
+                           (list "title" "date" '() '()))
+             (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags:\n")) p)
+                           (list "title" "date" '() '()))
+             (check-equal? (meta-data `((pre () "Title: title\nDate: date\n")) p)
+                           (list "title" "date" '() '())))
   (test-case "https://github.com/greghendershott/frog/issues/211"
-    (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags:\n")) p)
-                  (list "title" "date" '() '()))))
+             (check-equal? (meta-data `((pre () "Title: title\nDate: date\nTags:\n")) p)
+                           (list "title" "date" '() '()))))
 
 (define (tag-string->tags s)
   (match (regexp-split #px"," (string-trim s))
@@ -286,4 +287,10 @@
                     #:keywords tags
                     #:rel-next older-uri
                     #:rel-prev newer-uri)
-      (display-to-file* dest-path #:exists 'replace)))
+      (display-to-file* dest-path #:exists 'replace))
+  (when (node-available)
+    (prn1 "Minifying post ~a" (abs->rel/www dest-path))
+    (system
+     (string-append
+      "node --experimental-modules --no-warnings finalize.mjs "
+      (path->string dest-path)))))

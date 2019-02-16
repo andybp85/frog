@@ -5,9 +5,11 @@
          racket/match
          racket/path
          racket/string
+         racket/system
          rackjure/threading
          "../config/private/load.rkt"
          "bodies-page.rkt"
+         "params.rkt"
          "paths.rkt"
          "post-struct.rkt"
          "read-scribble.rkt"
@@ -81,6 +83,12 @@
                       #:description (xexprs->description xs)
                       #:uri-path uri-path)
         (display-to-file* dest-path #:exists 'replace))
+    (when (node-available)
+      (prn1 "Minifying non-post ~a" (abs->rel/www dest-path))
+      (system
+       (string-append
+        "node --experimental-modules --no-warnings finalize.mjs "
+        (path->string dest-path))))
     (cons uri-path v)))
 
 (define (make-title xs path)

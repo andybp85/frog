@@ -6,6 +6,7 @@
          racket/file
          racket/match
          racket/string
+         racket/system
          rackjure/str
          rackjure/threading
          (only-in markdown xexpr->string)
@@ -109,7 +110,7 @@
   (prn1 "Generating ~a" (abs->rel/www file))
   (~> (for/list ([x (in-list xs)])
         (match-define
-         (post title src modtime dest-path uri-path date older newer tags blurb more? body) x)
+          (post title src modtime dest-path uri-path date older newer tags blurb more? body) x)
         (define content-only (cond [(current-index-full?) body]
                                    [else blurb]))
         (define effectively-more? (and more? (not (current-index-full?))))
@@ -118,7 +119,7 @@
                          (cond [effectively-more?
                                 (xexpr->string
                                  `(footer ([class "read-more"])
-                                   (a ([href ,uri-path]) hellip "more" hellip)))]
+                                          (a ([href ,uri-path]) hellip "more" hellip)))]
                                [else ""])))
         (define tpl "index-template.html")
         (ensure-index-template tpl)
@@ -149,7 +150,13 @@
                     #:keywords (cond [tag (list tag)]
                                      [else (hash-keys (all-tags))])
                     #:tag tag)
-      (display-to-file* file #:exists 'replace)))
+      (display-to-file* file #:exists 'replace))
+  (when (node-available)
+    (prn1 "Minifying ~a" (abs->rel/www file))
+    (system
+     (string-append
+      "node --experimental-modules --no-warnings finalize.mjs "
+      (path->string file)))))
 
 (define (ensure-index-template tpl)
   ;; For users of old versions of Frog: If project has no

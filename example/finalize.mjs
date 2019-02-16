@@ -1,4 +1,5 @@
 import fs from "fs"
+import path from "path"
 import uncss from "uncss"
 import postcss from "postcss"
 import autoprefixer from "autoprefixer"
@@ -16,7 +17,12 @@ async function main(inFileName) {
                 : resolve({
                     html,
                     css: await new Promise(resolveUncss =>
-                        uncss([inFileName], (err, css) =>
+                        uncss([inFileName],
+                            {
+                                csspath: "css",
+                                htmlroot: "."
+                            },
+                            (err, css) =>
                             err
                                 ? reject(err)
                                 : resolveUncss(css)))
