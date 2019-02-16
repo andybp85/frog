@@ -4,6 +4,7 @@
          (planet ryanc/webapi:1:=1/oauth2)
          file/md5
          pkg/lib
+         rackjure/threading
          "params.rkt"
          "../paths.rkt")
 
@@ -13,7 +14,13 @@
 
 (define token '())
 (define token-file
-  (build-path (pkg-directory "gfrog") "private" "tokens" (bytes->string/locale (md5 (current-scheme/host)))))
+  (~>
+   (build-path
+    (pkg-directory "gfrog")
+    "private"
+    "tokens"
+    (bytes->string/locale (md5 (current-scheme/host))))
+   simplify-path))
 
 (define drive-client
   (oauth2-client

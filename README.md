@@ -9,7 +9,7 @@
 
 # GFrog
 
-This fork implements a command (`-L` or `--load-from-gdocs`) to load new posts from a Google Docs folder. The template utilizes [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) and [Tachyons](https://tachyons.io/) (instead of Bootstrap/jQuery), as well as some (optional) [Node.js](https://nodejs.org/) tooling to clean and inline the styles and minify everything.
+This fork implements a command (`-L` or `--load-from-gdocs`) to load new posts from a Google Docs folder. The template utilizes [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) and [Tachyons](https://tachyons.io/) (instead of Bootstrap/jQuery), as well as an optional [Node.js](https://nodejs.org/) workflow to clean and inline the styles and minify everything.
 
 [google-drive-racket](https://github.com/fgmart/google-drive-racket) provided much of the Google Docs access functionality, so much thanks to Prof. Martin!
 
@@ -57,25 +57,21 @@ GFrog uses the `description` field from the Google File object for `Tags` and `D
 tags: world, hello
 date: 2019-01-03
 ```
-(Yes, lowercase.)
+(Yes, lowercase. It's easier to tell you this than to go back and deal with casing.)
 
 To access the description field, select the document in Google Drive (don't open it), hit the info button `ⓘ` on the top right, then click on the `Details` tab. The field is on the bottom with the placeholder text "Add a description".
 
-Currently there's no syncing for stuff that gets removed from the Google Drive folder, so you'll have to delete the post from `_src/posts` yourself (and images if applicable). Same to re-parse a post you didn't touch on Google Docs/Drive or to re-download an image - just delete the local version.
+Currently there's no syncing for stuff that gets removed from the Google Drive folder, so you'll have to delete the post from `_src/posts` (and images from `img/` if applicable) yourself. Same to re-parse a post you didn't touch on Google Docs/Drive or to re-download an image - just delete the local version.
 
 ## NodeJS Finalizer
 
 **Requires Node.js v11.9.0+**
 
-If you don't have Node installed or have too low a version, the cleanup script won't run and won't bug you about it. You can turn it on later by using the command `-F` or `--finalizer-setup`.
+GFrog will try to install the Node deps during init. If you don't have Node installed or have <v11.9.0, the install won't run and GFrog won't bug you about it any further. You can turn it on later by enabling the param `node-available` and running the command `-F` or `--finalizer-setup`. If all's well, you'll see the script `finalize.mjs` in your blog's root dir. I've also set up a `.gitignore` file with `node_modules` and `package-lock.json` skipped for you.
 
-I'm a front-end guy by day and I'm using ES6 modules in the script, which is called `finalize.mjs`. If this is an inconvenience because you don't do JS for a living and therefore don't have more Node versions than system libs installed, you can skip the script by setting the param `node-available` to false. Or, you can do like we do and use the wonderful [nvm](https://github.com/creationix/nvm).
+I'm a front-end guy by day and I'm using ES6 modules, hence the version req and `.mjs` extension. If this is an inconvenience because you don't do JS for a living and therefore aren't used to dealing with having more Node versions than system libs installed, do like we do and use the wonderful [nvm](https://github.com/creationix/nvm).
 
-I've also set up a `.gitignore` file with `node_modules` skipped for you.
-
-I had the idea to make this configurable besides just on/off, but I want the full workflow and I have no idea if anyone else will use this. So, if you want this feature, reach out.
-
-And of course, the script is right there in your blog directory so feel free to modify to your heart's content!
+The script is right there in your blog directory so feel free to modify to your heart's content! I had the idea to make this configurable besides just on/off, but this is how I want my files processed and I have no idea if anyone else will use this. So, if you want this feature, make me feel important and post an issue :)
 
 ### Packages and Process
 * [uncss](https://github.com/uncss/uncss)
@@ -85,10 +81,10 @@ And of course, the script is right there in your blog directory so feel free to 
 * [strip-css-comments](https://github.com/sindresorhus/strip-css-comments)
 * [html-minifier](https://github.com/kangax/html-minifier)
 
-The full workflow results in a minified HTML file with just the CSS styles present on the page inline in the `<head>`. Here's how:
-1. After the regular Frog build process runs, each file is first run through uncss, which loads up all each html file and runs it through uncss to generate a string of just the styles used in that file.
+The full processing results in a minified HTML file with just the CSS styles present on the page inline in the `<head>`. Here's how:
+1. After the regular Frog build process runs, each file is read into a string and run through uncss to generate another string of just the styles used in that file.
 2. All comments are stripped from the resulting CSS string...
-3. Which is then run through autoprefixer and cssnano via postcss for vendor prefixing (basically as a fallback) and minification.
+3. Which is then run through autoprefixer and cssnano via postcss for vendor prefix double-checking and minification.
 4. The normal `<link>` CSS tags are stripped from the HTML string and the `<!-- CSS -->` comment is replaced with the CSS string.
 5. The whole HTML string is minified and written over the file it was read from.
 

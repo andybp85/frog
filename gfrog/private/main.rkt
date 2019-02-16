@@ -6,11 +6,14 @@
          racket/help
          racket/file
          racket/function
+         (only-in racket/list first second)
          racket/match
          racket/path ;moved to racket/base only as of Racket 6
+         racket/port
          racket/runtime-path
          racket/set
-         racket/system
+         racket/string
+         racket/system         
          racket/vector
          rackjure/threading
          web-server/dispatchers/dispatch
@@ -110,6 +113,10 @@
       (""
        "Load all posts from Google Docs.")
       (load-posts)]
+     [("-F" "--finalizer-setup")
+      (""
+       "Check Node version and install finalizer deps. Will not run if node-available is set to #f.")
+      (setup-node)]
      [("-b" "--build")
       (""
        "Generate files.")
@@ -189,13 +196,38 @@
               (list _ v))
      v]))
 
+
+
+(define (copy path)
+  (define from (~> (build-path example path) simplify-path))
+  (define to   (~> (build-path (top) path) simplify-path))
+  (prn0 "~a" to)
+  (make-directories-if-needed to)
+  (copy-directory/files from to))
+
+(define (setup-node)
+  (when (node-available)
+
+    (define (check-node-version vstring)
+      (let ([vlist (map (λ (v) (string->number v)) (string-split (string-trim vstring "v") "."))])
+        (and
+         (>= (first vlist) 11)
+         (>= (second vlist) 9))))
+
+    (cond
+      [(and
+        (check-node-version (port->string (first (process "node --version"))))
+        (system "npm install uncss postcss autoprefixer cssnano strip-css-comments html-minifier"))
+       (copy "finalize.mjs")]
+      [else
+       (define config-path
+         (build-path (top) "gfrog.rkt"))
+       (let ([config (call-with-input-file config-path port->string)])
+         (call-with-output-file config-path #:exists 'truncate #:mode 'text
+           (λ (out)
+             (display (string-replace config "(-> any)\n" "(-> any)\n  (node-available #f)\n") out))))])))
+
 (define (init-project)
-  (define (copy path)
-    (define from (~> (build-path example path) simplify-path))
-    (define to   (~> (build-path (top) path) simplify-path))
-    (prn0 "~a" to)
-    (make-directories-if-needed to)
-    (copy-directory/files from to))
   (prn0 "Creating files in ~a:" (build-path (top)))
   (copy "gfrog.rkt")
   (copy "_src/About.md")
@@ -206,7 +238,7 @@
   (copy "js/")
   (copy "img/")
   (copy ".gitignore")
-  (system "npm install uncss postcss autoprefixer cssnano strip-css-comments html-minifier")
+  (setup-node)
   (prn0 "Project ready. Try `raco gfrog -L -bwp` to build and preview."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
