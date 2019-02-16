@@ -1,10 +1,10 @@
-## Not yet fully working and the document below reflects plans
+## GDocs workflow working - just have to make my template and will have my blog up!
 ### Status:
 1. posts loading from google docs - DONE
 2. posts from gdocs building correctly - DONE
 3. css cleanup - DONE
-4. update verbose logging - WIP
-5. finish template
+4. update verbose logging - DONE
+5. finish template - WIP
 6. add contracts
 7. add unit tests
 

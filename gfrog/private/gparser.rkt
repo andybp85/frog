@@ -2,6 +2,7 @@
 
 (require racket/date
          racket/list
+         racket/format
          racket/port
          racket/string
          html-parsing
@@ -9,7 +10,8 @@
          sxml
          yaml
          "paths.rkt"
-         "gauth.rkt")
+         "gauth.rkt"
+         "verbosity.rkt")
 
 (provide parse-gdoc/post
          parse-gdoc/meta)
@@ -108,11 +110,13 @@
     (build-path (www/img-path) filename))
 
   (define out-img
-    (sxml:change-attrlist img `((src ,(string-append "/img/" filename)))))  
+    (sxml:change-attrlist img `((src ,(string-append "/img/" filename)))))
 
   (unless (file-exists? img-path)
     (with-output-to-file img-path
       (λ () (display (port->bytes port #:close? #t)))))
+
+  (prn1 "Parsed image ~a" filename)
 
   out-img)
   
@@ -146,8 +150,8 @@
     (define suggested-href
       (first (string-split (second (string-split original-href "q=")) "&amp;")))
 
-    (displayln (string-append "Original href: " original-href))
-    (displayln (string-append "Suggested href: " suggested-href))
+    (displayln (~a "Original href: " original-href))
+    (displayln (~a "Suggested href: " suggested-href))
     (display "Accept? [Y/<url>] ")
 
     (define user-input
@@ -213,6 +217,7 @@
 
 
 (define (parse-gdoc/post content post-meta post-path)
+  (prn0 "Parsing ~a" (abs->rel/src post-path))
 
   (define html
     (srl:sxml->html-noindent 

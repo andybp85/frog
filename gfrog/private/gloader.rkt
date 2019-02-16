@@ -2,6 +2,7 @@
 
 (require racket/class
          racket/date
+         racket/format
          racket/string
          gregor
          json
@@ -9,7 +10,8 @@
          "gauth.rkt"
          "gparser.rkt"
          "params.rkt"
-         "paths.rkt")
+         "paths.rkt"
+         "verbosity.rkt")
 
 (provide load-posts)
 
@@ -19,7 +21,9 @@
   (define (get-files obj)
     (hash-ref obj 'files
               (λ ()
-                (eprintf "No files found in Google Drive folder.\n")
+                (if (hash-ref obj 'error)
+                    (eprintf (hash-ref (hash-ref obj 'error) 'message))
+                    (eprintf "No files found in Google Drive folder.\n"))
                 (exit 1))))
 
   (define (list-children folder-id . next-page-token)
@@ -43,6 +47,7 @@
         (get-files this-page))))
 
 (define (get-gdoc-file mime file-id)
+  (prn1 "Getting file ~a" file-id)
   (get-pure-port
    (string->url (string-append "https://www.googleapis.com/drive/v3/files/"
                                file-id
@@ -55,6 +60,7 @@
 ;  (regexp-replace* (~a "^\uFEFF") p ""))
 
 (define (get-gdoc-file-meta fields file-id)
+  (prn1 "Getting meta for ~a" file-id)
   (read-json
    (get-pure-port
     (string->url (string-append "https://www.googleapis.com/drive/v3/files/"
@@ -64,6 +70,7 @@
     token)))
 
 (define (get-posts-meta)
+  (prn1 "Getting posts meta")
   (map
    (λ (file)
          
@@ -94,6 +101,7 @@
    (list-all-children (ga-posts-folder))))
 
 (define (load-posts)
+  (prn0 "Loading posts")
 
   (define (gdoc-newer? post-path post-meta)
     (datetime<?
@@ -108,4 +116,4 @@
       (build-path (src/posts-path) (hash-ref post-meta 'filename)))
     
     (when (or (not (file-exists? post-path)) (gdoc-newer? post-path post-meta))
-        (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-meta post-path))))
+      (parse-gdoc/post (get-gdoc-file "text/html" (hash-ref post-meta 'id)) post-meta post-path))))
