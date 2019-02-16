@@ -206,7 +206,7 @@
   (copy "js/")
   (copy "img/")
   (copy ".gitignore")
-  (system "npm install postcss-cli uncss autoprefixer cssnano")
+  (system "npm install uncss postcss autoprefixer cssnano strip-css-comments html-minifier")
   (prn0 "Project ready. Try `raco gfrog -L -bwp` to build and preview."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -353,7 +353,11 @@
                (map full-uri
                     (append (map post-uri-path (filter linked-post?
                                                        (hash-values new-posts)))
-                            non-post-pages))))))
+                            non-post-pages)))))
+
+  ;; [6] postcss cleanup and inlining
+  (prn1 "Cleaning and inlining CSS")
+  )
 
 ;;----------------------------------------------------------------------------
 

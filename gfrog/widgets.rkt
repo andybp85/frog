@@ -123,7 +123,7 @@
               var dsq = document.createElement('script');
               dsq.type = 'text/javascript';
               dsq.async = true;
-              dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+              dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
               (document.head || document.body).appendChild(dsq);
           })();
         </script>
@@ -133,7 +133,7 @@
   @{@url["http://livefyre.com"]}
   @list{
         <div id="livefyre-comments"></div>
-        <script type="text/javascript" src="//zor.livefyre.com/wjs/v3.0/javascripts/livefyre.js"></script>
+        <script type="text/javascript" src="https://zor.livefyre.com/wjs/v3.0/javascripts/livefyre.js"></script>
         <script type="text/javascript">
         (function () {
             var articleId = fyre.conv.load.makeArticleId(null);
@@ -160,7 +160,7 @@
         var idcomments_post_url;
         </script>
         <span id="IDCommentsPostTitle" style="display:none"></span>
-        <script type='text/javascript' src='//www.intensedebate.com/js/genericCommentWrapperV2.js'></script>})
+        <script type='text/javascript' src='https://www.intensedebate.com/js/genericCommentWrapperV2.js'></script>})
 
 (define/doc (google-universal-analytics [account string?] list?)
   @{For users of ``universal'' analytics (@filepath{analytics.js}).}
@@ -169,7 +169,7 @@
            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-           })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+           })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
            ga('create', '@|account|', 'auto');
            ga('send', 'pageview');
@@ -197,11 +197,6 @@
          </script>
          })
 
-(define/doc (google-plus-share-button [full-uri string?] list?)
-  @{Typically used in a @secref["post-template"].}
-  @list{<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
-        <g:plusone size="medium" href="@full-uri"></g:plusone>})
-
 (define/doc (twitter-follow-button [name string?]
                                    [label (or/c #f string?) #f]
                                    list?)
@@ -220,7 +215,7 @@
                 if(!d.getElementById(id)){
                     js=d.createElement(s);
                     js.id=id;
-                    js.src="//platform.twitter.com/widgets.js";
+                    js.src="https://platform.twitter.com/widgets.js";
                     fjs.parentNode.insertBefore(js,fjs);
                 }
             }(document,"script","twitter-wjs");
@@ -272,7 +267,7 @@
               if(!d.getElementById(id)){
                   js=d.createElement(s);
                   js.id=id;
-                  js.src="//platform.twitter.com/widgets.js";
+                  js.src="https://platform.twitter.com/widgets.js";
                   fjs.parentNode.insertBefore(js,fjs);
               }
           }(document,"script","twitter-wjs");
@@ -288,7 +283,7 @@
               if(!d.getElementById(id)){
                   js=d.createElement(s);
                   js.id=id;
-                  js.src="//platform.twitter.com/widgets.js";
+                  js.src="https://platform.twitter.com/widgets.js";
                   fjs.parentNode.insertBefore(js,fjs);
               }
           }(document,"script","twitter-wjs");
