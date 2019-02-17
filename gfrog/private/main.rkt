@@ -3,9 +3,9 @@
 (require racket/cmdline
          racket/contract/base
          racket/contract/region
-         racket/help
          racket/file
          racket/function
+         racket/help
          (only-in racket/list first second)
          racket/match
          racket/path ;moved to racket/base only as of Racket 6
@@ -30,6 +30,7 @@
          "paths.rkt"
          "post-struct.rkt"
          "posts.rkt"
+         "sass.rkt"
          "serialize-posts.rkt"
          "stale.rkt"
          "tags.rkt"
@@ -117,6 +118,10 @@
       (""
        "Check Node version and install finalizer deps. Will not run if node-available is set to #f.")
       (setup-node)]
+     ;     [("-SF" "--skip-finalizer")
+     ;      (""
+     ;       "Skip the finalizer script (useful while editing the site).")
+     ;      ()]
      [("-b" "--build")
       (""
        "Generate files.")
@@ -240,7 +245,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (build)
-  ;; [0] Build `old-posts`, `new-posts`, and `sorted-posts`.
+
+  ;; [0] Compile Sass
+  (with-handlers ([exn:fail:contract?
+                   (λ (e) (prn0 e))]
+                  [exn:fail?
+                   (λ (e)
+                     (if (string-contains? (exn->string e) "implementation not found")
+                         (prn1 "libsass not found")
+                         (raise e)))])
+    (call-with-output-file (build-path 'same "css/posts.css") #:exists 'truncate #:mode 'text
+      (λ (out)
+        (prn1 "compiling sass")
+        (display (parse-sass "css/posts.scss") out))))
+
+  ;; [1] Build `old-posts`, `new-posts`, and `sorted-posts`.
   ;;
   ;; We use a file that's a serialization of (hash/c path? post?)
   ;; where the hash key is the source file pathname. The file is the
@@ -302,7 +321,7 @@
   ;; determine what needs to be built -- and more importantly, what
   ;; does NOT need to be built.
   ;;
-  ;; [1] Posts
+  ;; [2] Posts
   ;;
   ;; (a) Delete obsolete output files. When post-dest-path has
   ;; changed, delete the old post-dest-path.
@@ -329,7 +348,7 @@
                        (hash-ref new-posts (post-older post) #f)
                        (hash-ref new-posts (post-newer post) #f))))
 
-  ;; [2] Tags: Output to index pages and feed files
+  ;; [3] Tags: Output to index pages and feed files
   ;;
   ;; (a) Delete obsolete output files, for tags no longer in use.
   (for ([tag (in-list (hash-keys old-tags))])
@@ -365,14 +384,14 @@
               (stale/templates? tag))
       (write-stuff-for-tag tag posts-this-tag)))
 
-  ;; [3] Save `new-posts` (to be used as the `old-posts` for our next
+  ;; [4] Save `new-posts` (to be used as the `old-posts` for our next
   ;;     build).
   (serialize-posts new-posts)
 
-  ;; [4] Non-post pages.
+  ;; [5] Non-post pages.
   (define non-post-pages (build-non-post-pages))
 
-  ;; [5] sitemap.txt, populated from new-posts and non-post-pages.
+  ;; [6] sitemap.txt, populated from new-posts and non-post-pages.
   ;;     (Generating this is cheap, so just always do it.)
   (prn1 "Generating sitemap.txt")
   (with-output-to-file (build-path (www-path) "sitemap.txt") #:exists 'replace

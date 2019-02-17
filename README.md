@@ -4,17 +4,23 @@
 2. posts from gdocs building correctly - DONE
 3. css cleanup - DONE
 4. update verbose logging - DONE
+5. libsass - DONE
 5. finish template - WIP
 6. add contracts
 7. add unit tests
 
 # GFrog
 
-This fork implements a command (`-L` or `--load-from-gdocs`) to load new posts from a Google Docs folder. The template utilizes [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) and [Tachyons](https://tachyons.io/) (instead of Bootstrap/jQuery), as well as an optional [Node.js](https://nodejs.org/) workflow to clean and inline the styles and minify everything.
+This fork allows you to load Docs in a Google Drive folder. Instead of Bootstrap/jQuery, the template utilizes [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) for the layout, [Tachyons](https://tachyons.io/) for the "structural" styles, and one stylesheet fo post styles that you can optionally write in [Sass](https://sass-lang.com/) (requires [libsass](https://sass-lang.com/libsass)). There's also an optional [Node.js](https://nodejs.org/) workflow to clean and inline the styles and minify everything.
 
 [google-drive-racket](https://github.com/fgmart/google-drive-racket) provided much of the Google Docs access functionality, so much thanks to Prof. Martin!
 
-## To utilize Google Drive
+### New Commands
+* `-L` or `--load-from-gdocs`: Load new posts from Google Drive.
+* `-F` or `--finalizer-setup`: Set up the Node finalizer script.
+* `-SF` or `--skip-finalizer`: Skip the finalizer (for faster builds while editing the site)
+
+## Google Drive
 You need to define three params:
 ```
 ga-client-id
@@ -35,7 +41,7 @@ GFROG_GA_POSTS_FOLDER
 
 Note that tokens are stored in files named with a hash of param `current-scheme/host`, so if this is changed you'll be prompted to log in again.
 
-### Set up credentials
+### Set Up Credentials
 (mostly taken from a comment in [google-drive-racket](https://github.com/fgmart/google-drive-racket))
 1. Go to Google Developers Console and make a project.
 2. Go to Dashboard > Explore other services > Enable APIs and get credentials like keys.
@@ -45,12 +51,12 @@ Note that tokens are stored in files named with a hash of param `current-scheme/
 6. Then copy the client ID and secret into the appropriate env vars.
 7. In Google Drive, make a folder for your posts, and then copy the folder ID in its env var.
 
-### Writing posts in GDocs
+### Writing Posts in GDocs
 GFrog will load the doc as HTML and strip out the GDocs-specific stuff, so just make a doc as you normally would. Some things that are too complex to replicate (like multiple columns) don't work.
 
 Google Docs use a redirect for link hrefs, so when you load a post GFrog will parse the links and try to determine the actual URL from the redirect, then show you the original and parsed URL and ask if you'd like to accept it or put a different URL in.
 
-Images are downloaded to and served from `/img/`. Note that an image won't download again if one with the same name is already present in the folder.
+Images are downloaded to and served from `img/`. Note that an image won't download again if one with the same name is already present in the folder.
 
 GFrog uses the `description` field from the Google File object for `Tags` and `Date` (nothing for `Authors` at the moment), which it parses with a YAML parser. It needs at least `Date`, in `yyyy-mm-dd` format. For example:
 
@@ -64,11 +70,17 @@ To access the description field, select the document in Google Drive (don't open
 
 Currently there's no syncing for stuff that gets removed from the Google Drive folder, so you'll have to delete the post from `_src/posts` (and images from `img/` if applicable) yourself. Same to re-parse a post you didn't touch on Google Docs/Drive or to re-download an image - just delete the local version.
 
-## NodeJS Finalizer
+## Sass
+
+If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `posts.css`. If you have it installed, you can write scss to `posts.scss` and GFrog will compile it into `posts.css` (note this will nuke out anything in `posts.css`). That's all there is to it!
+
+Well, a little bit more: the file names are hard-coded for th moment. At some point I'll make GFrog compile whatever sass/scss files it finds in the `css/`. And if sass errors, you'll get a message but the build will keep running.
+
+## Finalizer
 
 **Requires Node.js v11.9.0+**
 
-GFrog will try to install the Node deps during init. If you don't have Node installed or have <v11.9.0, the install won't run and GFrog won't bug you about it any further. You can turn it on later by enabling the param `node-available` and running the command `-F` or `--finalizer-setup`. If all's well, you'll see the script `finalize.mjs` in your blog's root dir. I've also set up a `.gitignore` file with `node_modules` and `package-lock.json` skipped for you.
+GFrog will try to install the Node deps during init. If you don't have Node installed or have <v11.9.0, the install won't run and GFrog won't bug you about it any further. You can turn it on later by enabling the param `node-available` and running the finalizer set up command. If all's well, you'll see the script `finalize.mjs` in your blog's root dir. I've also set up a `.gitignore` file with `node_modules` and `package-lock.json` skipped for you.
 
 I'm a front-end guy by day and I'm using ES6 modules, hence the version req and `.mjs` extension. If this is an inconvenience because you don't do JS for a living and therefore aren't used to dealing with having more Node versions than system libs installed, do like we do and use the wonderful [nvm](https://github.com/creationix/nvm).
 
