@@ -72,7 +72,7 @@ Currently there's no syncing for stuff that gets removed from the Google Drive f
 
 ## Sass
 
-If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `posts.css`. If you have it installed, you can write scss to `posts.scss` and GFrog will compile it into `posts.css` (note this will nuke out anything in `posts.css`). That's all there is to it!
+If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `css/posts.css`. If you have it installed, you can write scss to `_src/scss/posts.scss` and GFrog will compile it into `css/posts.css` (note this will nuke out anything in `posts.css`). That's all there is to it!
 
 Well, a little bit more: the file names are hard-coded for th moment. At some point I'll make GFrog compile whatever sass/scss files it finds in the `css/`. And if sass errors, you'll get a message but the build will keep running.
 

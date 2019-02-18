@@ -240,7 +240,7 @@
   (copy "img/")
   (copy ".gitignore")
   (setup-node)
-  (prn0 "Project ready. Try `raco gfrog -L -bwp` to build and preview."))
+  (prn0 "Project ready. Try `raco gfrog -bwp` to build and preview."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -257,7 +257,7 @@
     (call-with-output-file (build-path 'same "css/posts.css") #:exists 'truncate #:mode 'text
       (λ (out)
         (prn1 "compiling sass")
-        (display (parse-sass "css/posts.scss") out))))
+        (display (parse-sass "_src/scss/posts.scss") out))))
 
   ;; [1] Build `old-posts`, `new-posts`, and `sorted-posts`.
   ;;
