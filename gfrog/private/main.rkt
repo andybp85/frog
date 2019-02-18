@@ -118,10 +118,10 @@
       (""
        "Check Node version and install finalizer deps. Will not run if node-available is set to #f.")
       (setup-node)]
-     ;     [("-SF" "--skip-finalizer")
-     ;      (""
-     ;       "Skip the finalizer script (useful while editing the site).")
-     ;      ()]
+     [("-K" "--skip-finalizer")
+      (""
+       "Skip the finalizer script (useful while editing the site).")
+      (node-available #f)]
      [("-b" "--build")
       (""
        "Generate files.")

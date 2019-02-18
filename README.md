@@ -18,7 +18,7 @@ This fork allows you to load Docs in a Google Drive folder. Instead of Bootstrap
 ### New Commands
 * `-L` or `--load-from-gdocs`: Load new posts from Google Drive.
 * `-F` or `--finalizer-setup`: Set up the Node finalizer script.
-* `-SF` or `--skip-finalizer`: Skip the finalizer (for faster builds while editing the site)
+* `-K` or `--skip-finalizer`: Skip the finalizer (for faster builds while editing the site)
 
 ## Google Drive
 You need to define three params:
