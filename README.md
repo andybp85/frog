@@ -18,7 +18,7 @@ This fork allows you to load Docs in a Google Drive folder. Instead of Bootstrap
 ### New Commands
 * `-L` or `--load-from-gdocs`: Load new posts from Google Drive.
 * `-F` or `--finalizer-setup`: Set up the Node finalizer script.
-* `-K` or `--skip-finalizer`: Skip the finalizer (for faster builds while editing the site)
+* `-K` or `--skip-finalizer`: Skip the finalizer.
 
 ## Google Drive
 You need to define three params:
@@ -72,9 +72,27 @@ Currently there's no syncing for stuff that gets removed from the Google Drive f
 
 ## Sass
 
-If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `css/posts.css`. If you have it installed, you can write scss to `_src/scss/posts.scss` and GFrog will compile it into `css/posts.css` (note this will nuke out anything in `posts.css`). That's all there is to it!
+**Requires libsass+**
 
-Well, a little bit more: the file names are hard-coded for th moment. At some point I'll make GFrog compile whatever sass/scss files it finds in the `css/`. And if sass errors, you'll get a message but the build will keep running.
+You can make your posts' styles in `_src/scss/posts.scss`, and I've included `tachyons-sass` to import from if you like. This goes great with Sass's `@extend`:
+
+```
+@import "tachyons-sass/_variables.scss";
+@import "tachyons-sass/_skins.scss";
+
+article {
+    a {
+        @extend .silver
+    }
+
+}
+```
+
+We might wind up with some duped selectors this way, but in this one case, I'll overlook perfection for convenience.
+
+If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `css/posts.css`. If you have it installed, GFrog will compile `posts.scss` into `css/posts.css` (note this will nuke out anything in `posts.css`). That's all there is to it!
+
+Well, a little bit more. The file names are hard-coded for the moment. At some point I'll make GFrog compile whatever sass/scss files it finds in `_src/scss/`. And, if sass errors, you'll get the error message but the build will keep running.
 
 ## Finalizer
 
