@@ -79,21 +79,25 @@ Currently there's no syncing for stuff that gets removed from the Google Drive f
 
 **Requires libsass**
 
-You can make your posts' styles in `_src/scss/posts.scss`, and I've included `tachyons-sass` to import from if you like. This goes great with Sass's `@extend`:
+You can make your posts' styles in `_src/scss/posts.scss`, and I've included a custom extend-only version of `tachyons-sass` to import from if you like. This goes great with Sass's `@extend`:
 
 ```
+// Sass
 @import "tachyons-sass/_variables.scss";
 @import "tachyons-sass/_skins.scss";
 
 article {
     a {
-        @extend .silver
+        @extend %silver
     }
 
 }
-```
 
-We might wind up with some duped selectors this way, but in this one case, I'll overlook perfection for convenience.
+// CSS
+article a {
+  color: #999;
+}
+```
 
 If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `css/posts.css`. If you have it installed, GFrog will compile `posts.scss` into `css/posts.css` (note this will nuke out anything in `posts.css`).
 
