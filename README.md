@@ -2,16 +2,21 @@
 ### Status:
 1. posts loading from google docs - DONE
 2. posts from gdocs building correctly - DONE
-3. css cleanup - DONE
+3. finalizer node script - DONE
 4. update verbose logging - DONE
 5. libsass - DONE
-5. finish template - WIP
+5. finish template, shakedown build & workflow - WIP
 6. add contracts
 7. add unit tests
 
 # GFrog
 
-This fork allows you to load Docs in a Google Drive folder. Instead of Bootstrap/jQuery, the template utilizes [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) for the layout, [Tachyons](https://tachyons.io/) for the "structural" styles, and one stylesheet fo post styles that you can optionally write in [Sass](https://sass-lang.com/) (requires [libsass](https://sass-lang.com/libsass)). There's also an optional [Node.js](https://nodejs.org/) workflow to clean and inline the styles and minify everything.
+* Load posts from Docs in a Google Drive folder!
+* Instead of Bootstrap/jQuery, the template utilizes:
+    * [CSS Grid](https://learncssgrid.com/#naming-positioning-items-grid-areas) for the layout.
+    * [Tachyons](https://tachyons.io/) for the "structural" styles.
+    * One stylesheet for post styles that you can optionally write in [Sass](https://sass-lang.com/) (requires [libsass](https://sass-lang.com/libsass)).
+* Optional [Node.js](https://nodejs.org/) workflow to clean and inline the styles and minify everything.
 
 [google-drive-racket](https://github.com/fgmart/google-drive-racket) provided much of the Google Docs access functionality, so much thanks to Prof. Martin!
 
@@ -72,7 +77,7 @@ Currently there's no syncing for stuff that gets removed from the Google Drive f
 
 ## Sass
 
-**Requires libsass+**
+**Requires libsass**
 
 You can make your posts' styles in `_src/scss/posts.scss`, and I've included `tachyons-sass` to import from if you like. This goes great with Sass's `@extend`:
 
@@ -90,9 +95,9 @@ article {
 
 We might wind up with some duped selectors this way, but in this one case, I'll overlook perfection for convenience.
 
-If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `css/posts.css`. If you have it installed, GFrog will compile `posts.scss` into `css/posts.css` (note this will nuke out anything in `posts.css`). That's all there is to it!
+If you don't have [libsass](https://sass-lang.com/libsass) installed, GFrog will just skip it and you can write your styles in `css/posts.css`. If you have it installed, GFrog will compile `posts.scss` into `css/posts.css` (note this will nuke out anything in `posts.css`).
 
-Well, a little bit more. The file names are hard-coded for the moment. At some point I'll make GFrog compile whatever sass/scss files it finds in `_src/scss/`. And, if sass errors, you'll get the error message but the build will keep running.
+The file names are hard-coded for the moment. At some point I'll make GFrog compile whatever sass/scss files it finds in `_src/scss/`. If sass errors, you'll get the error message but the build will keep running.
 
 ## Finalizer
 
